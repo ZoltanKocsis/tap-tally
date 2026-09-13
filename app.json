@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "TapTally",
+    "slug": "tap-tally",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "taptally",
+    "userInterfaceStyle": "light",
+    "android": {
+      "package": "com.taptally.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#CFEAE3",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.taptally.app"
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#F5F8F6",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 140
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
