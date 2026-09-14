@@ -6,7 +6,8 @@
   "portsAttributes": {
     "8081": {
       "label": "Metro Bundler",
-      "onAutoForward": "silent"
+      "onAutoForward": "silent",
+      "visibility": "public"
     }
   },
   "customizations": {

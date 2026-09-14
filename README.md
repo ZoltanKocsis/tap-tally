@@ -17,15 +17,17 @@ This repo is set up to develop entirely in the browser via [GitHub Codespaces](h
 
 1. On the repo's GitHub page: **Code → Codespaces → Create codespace on main**.
 2. Wait for the container to build — it runs `npm install` automatically.
-3. In the Codespace terminal, start the dev server in tunnel mode:
+3. Your phone and the Codespace aren't on the same network, so the dev server needs to be reachable over the internet. The most reliable way is Codespaces' own port forwarding (not ngrok, which can be flaky):
 
    ```bash
-   npm run tunnel
+   npm run codespaces
    ```
 
-   Tunnel mode is required because your phone and the Codespace aren't on the same network — it routes the connection over the internet so there's no CDN-style caching delay to wait out.
+   The first time, also open the **PORTS** tab (bottom panel, next to TERMINAL), find port **8081**, right-click it → **Port Visibility** → **Public**. (Devcontainer rebuilds after this repo's latest commit will set this automatically.)
 
-4. Install **[Expo Go](https://expo.dev/go)** from the Play Store on your Android phone.
+   If that ever fails, `npm run tunnel` (ngrok-based) is the fallback — same idea, just a different tunnel provider.
+
+4. Install **[Expo Go](https://expo.dev/go)** from the Play Store on your Android phone, and make sure you're logged into the **same Expo account** in Expo Go and in the Codespace terminal (`npx expo login`) — recent Expo Go versions require this.
 5. Scan the QR code printed in the terminal with the Expo Go app.
 6. Edit any file in `src/` and save — the app on your phone reloads automatically, usually within a second or two.
 
