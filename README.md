@@ -1,12 +1,10 @@
 # TapTally
 
-A simple, local-first Android app for counting anything, once a tap at a time — push-ups, cigarettes, glasses of water, whatever you decide to track. Built with [Expo](https://expo.dev) (React Native + TypeScript). All data stays on your phone in a local SQLite database; nothing is sent anywhere.
+A simple, local-first Android app for counting anything, one tap at a time — **push-ups, cigarettes, glasses of water, whatever you decide to track. ** All data stays on your phone  (in a local SQLite database;) nothing is sent anywhere.
 
 ## Features
 
 - Track **multiple items** at once — switch between them from the dropdown at the top
-- One-tap **+1** counter, with a **Cancel +1** to undo a mis-tap
-- Today's log, with per-entry delete
 - **Last 7 Days / This Month / This Year / All Together** bar charts, per item
 - Add, rename, or delete items anytime, in Settings
 - **Reset** a single item's history, or delete everything and start over
