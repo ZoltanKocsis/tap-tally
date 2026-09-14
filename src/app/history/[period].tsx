@@ -1,11 +1,12 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { Redirect, useFocusEffect, useLocalSearchParams } from 'expo-router';
 
 import { BarChart } from '@/components/BarChart';
+import { Header } from '@/components/Header';
 import { dataForPeriod, PERIOD_TITLES, type Period } from '@/lib/aggregate';
-import { getItemName } from '@/lib/db';
+import { useItems } from '@/lib/items-context';
 import { colors, fontSize, spacing } from '@/lib/theme';
 
 const VALID_PERIODS: Period[] = ['week', 'month', 'year', 'all'];
@@ -13,17 +14,28 @@ const VALID_PERIODS: Period[] = ['week', 'month', 'year', 'all'];
 export default function History() {
   const { period: rawPeriod } = useLocalSearchParams<{ period: string }>();
   const period: Period = VALID_PERIODS.includes(rawPeriod as Period) ? (rawPeriod as Period) : 'week';
+  const { currentItem } = useItems();
+  const [refreshTick, setRefreshTick] = useState(0);
 
-  const data = useMemo(() => dataForPeriod(period), [period]);
-  const itemName = useMemo(getItemName, []);
+  useFocusEffect(useCallback(() => setRefreshTick((t) => t + 1), []));
+
+  const data = useMemo(
+    () => (currentItem ? dataForPeriod(period, currentItem.id) : []),
+    [period, currentItem, refreshTick],
+  );
   const total = useMemo(() => data.reduce((sum, point) => sum + point.value, 0), [data]);
+
+  if (!currentItem) {
+    return <Redirect href="/onboarding" />;
+  }
 
   return (
     <SafeAreaView style={styles.safe} edges={['bottom', 'left', 'right']}>
-      <Stack.Screen options={{ title: PERIOD_TITLES[period] }} />
+      <Header showBack />
       <View style={styles.summary}>
+        <Text style={styles.periodTitle}>{PERIOD_TITLES[period]}</Text>
         <Text style={styles.total}>
-          {total} {itemName} total
+          {total} {currentItem.name} total
         </Text>
       </View>
       <View style={styles.chartWrap}>
@@ -36,6 +48,7 @@ export default function History() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
   summary: { paddingHorizontal: spacing.lg, paddingTop: spacing.md },
-  total: { fontSize: fontSize.lg, fontWeight: '700', color: colors.ink },
+  periodTitle: { fontSize: fontSize.xs, color: colors.muted, textTransform: 'uppercase', letterSpacing: 0.5 },
+  total: { fontSize: fontSize.lg, fontWeight: '700', color: colors.ink, marginTop: spacing.xs },
   chartWrap: { flex: 1, padding: spacing.lg },
 });

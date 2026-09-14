@@ -1,15 +1,15 @@
 # TapTally
 
-A simple, local-first Android app for counting anything, once a tap at a time — push-ups, cigarettes, glasses of water, whatever you decide to track. Built with [Expo](https://expo.dev) (React Native + TypeScript). All data stays on your phone in a local SQLite database; nothing is sent anywhere unless you export it yourself.
+A simple, local-first Android app for counting anything, once a tap at a time — push-ups, cigarettes, glasses of water, whatever you decide to track. Built with [Expo](https://expo.dev) (React Native + TypeScript). All data stays on your phone in a local SQLite database; nothing is sent anywhere.
 
 ## Features
 
+- Track **multiple items** at once — switch between them from the dropdown at the top
 - One-tap **+1** counter, with a **Cancel +1** to undo a mis-tap
 - Today's log, with per-entry delete
-- **This Week / This Month / This Year / All Together** bar charts
-- Rename what you're counting anytime, in Settings
-- **Start over** to wipe all data
-- **Export to CSV or Excel (.xlsx)** from Settings
+- **Last 7 Days / This Month / This Year / All Together** bar charts, per item
+- Add, rename, or delete items anytime, in Settings
+- **Reset** a single item's history, or delete everything and start over
 
 ## Developing in GitHub Codespaces (no local install needed)
 
@@ -40,15 +40,15 @@ src/
   app/            screens (file-based routing via expo-router)
     index.tsx        Home screen
     onboarding.tsx    first-launch "what are you counting?" screen
-    settings.tsx      rename / export / start over
-    history/[period].tsx   week / month / year / all bar chart
-  components/     BarChart, Logo
+    settings.tsx      manage items / reset / delete everything
+    history/[period].tsx   last-7-days / month / year / all bar chart
+  components/     Header, ItemPicker, SettingsButton, BarChart, Logo
   lib/
-    db.ts           SQLite data layer
-    aggregate.ts    turns raw entries into chart data
-    export.ts       CSV / XLSX export
-    format.ts       date/time formatting
-    theme.ts        colors, spacing, type scale
+    db.ts             SQLite data layer (items + entries)
+    items-context.tsx  shared "current item" state across screens
+    aggregate.ts      turns raw entries into chart data
+    format.ts         date/time formatting
+    theme.ts          colors, spacing, type scale
 ```
 
 ## Building an installable APK

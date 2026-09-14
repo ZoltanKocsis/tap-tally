@@ -3,49 +3,38 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Redirect, router, useFocusEffect } from 'expo-router';
 
-import { Logo } from '@/components/Logo';
-import {
-  addEntry,
-  deleteEntry,
-  deleteMostRecentEntry,
-  type Entry,
-  getItemName,
-  getTodayEntries,
-  isOnboarded,
-} from '@/lib/db';
+import { Header } from '@/components/Header';
+import { PERIOD_TITLES, type Period } from '@/lib/aggregate';
+import { addEntry, deleteEntry, deleteMostRecentEntry, type Entry, getTodayEntries } from '@/lib/db';
 import { formatDayHeader, formatTime } from '@/lib/format';
+import { useItems } from '@/lib/items-context';
 import { colors, fontSize, radius, spacing } from '@/lib/theme';
 
-const HISTORY_LINKS = [
-  { period: 'week', label: 'This Week' },
-  { period: 'month', label: 'This Month' },
-  { period: 'year', label: 'This Year' },
-  { period: 'all', label: 'All Together' },
-] as const;
+const HISTORY_PERIODS: Period[] = ['week', 'month', 'year', 'all'];
 
 export default function Home() {
-  const [onboarded] = useState(isOnboarded);
-  const [itemName, setItemName] = useState(getItemName);
+  const { onboarded, currentItem } = useItems();
   const [entries, setEntries] = useState<Entry[]>([]);
 
   const refresh = useCallback(() => {
-    setItemName(getItemName());
-    setEntries(getTodayEntries());
-  }, []);
+    if (currentItem) setEntries(getTodayEntries(currentItem.id));
+  }, [currentItem]);
 
   useFocusEffect(refresh);
 
-  if (!onboarded) {
+  if (!onboarded || !currentItem) {
     return <Redirect href="/onboarding" />;
   }
 
   function handleAdd() {
-    addEntry();
+    if (!currentItem) return;
+    addEntry(currentItem.id);
     refresh();
   }
 
   function handleCancel() {
-    if (deleteMostRecentEntry()) refresh();
+    if (!currentItem) return;
+    if (deleteMostRecentEntry(currentItem.id)) refresh();
   }
 
   function handleDelete(id: number) {
@@ -54,24 +43,19 @@ export default function Home() {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <View style={styles.header}>
-        <Logo size={32} />
-        <Pressable onPress={() => router.push('/settings')} hitSlop={12}>
-          <Text style={styles.settingsGear}>⚙︎</Text>
-        </Pressable>
-      </View>
+    <SafeAreaView style={styles.safe} edges={['bottom', 'left', 'right']}>
+      <Header />
 
       <View style={styles.summary}>
         <Text style={styles.day}>{formatDayHeader(new Date())}</Text>
         <Text style={styles.total}>
-          <Text style={styles.totalNumber}>{entries.length}</Text> {itemName} today
+          <Text style={styles.totalNumber}>{entries.length}</Text> {currentItem.name} today
         </Text>
       </View>
 
       <View style={styles.actionsRow}>
         <Pressable style={styles.addButton} onPress={handleAdd}>
-          <Text style={styles.addButtonText}>+1 {itemName}</Text>
+          <Text style={styles.addButtonText}>+1 {currentItem.name}</Text>
         </Pressable>
         <Pressable
           style={[styles.cancelButton, entries.length === 0 && styles.buttonDisabled]}
@@ -99,13 +83,9 @@ export default function Home() {
       />
 
       <View style={styles.navRow}>
-        {HISTORY_LINKS.map(({ period, label }) => (
-          <Pressable
-            key={period}
-            style={styles.navButton}
-            onPress={() => router.push(`/history/${period}`)}
-          >
-            <Text style={styles.navButtonText}>{label}</Text>
+        {HISTORY_PERIODS.map((period) => (
+          <Pressable key={period} style={styles.navButton} onPress={() => router.push(`/history/${period}`)}>
+            <Text style={styles.navButtonText}>{PERIOD_TITLES[period]}</Text>
           </Pressable>
         ))}
       </View>
@@ -115,17 +95,9 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-  },
-  settingsGear: { fontSize: fontSize.xl, color: colors.muted },
   summary: {
     paddingHorizontal: spacing.lg,
-    marginTop: spacing.sm,
+    marginTop: spacing.md,
     marginBottom: spacing.md,
   },
   day: { fontSize: fontSize.md, color: colors.muted },

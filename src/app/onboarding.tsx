@@ -4,18 +4,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 
 import { Logo } from '@/components/Logo';
-import { completeOnboarding } from '@/lib/db';
+import { useItems } from '@/lib/items-context';
 import { colors, fontSize, radius, spacing } from '@/lib/theme';
 
 const EXAMPLES = ['Push-ups', 'Glasses of water', 'Cigarettes', 'Coffees'];
 
 export default function Onboarding() {
+  const { finishOnboarding } = useItems();
   const [name, setName] = useState('');
   const canSubmit = name.trim().length > 0;
 
   function submit() {
     if (!canSubmit) return;
-    completeOnboarding(name);
+    finishOnboarding(name);
     router.replace('/');
   }
 
@@ -57,7 +58,7 @@ export default function Onboarding() {
             <Text style={styles.buttonText}>Get started</Text>
           </Pressable>
 
-          <Text style={styles.hint}>You can rename this anytime in Settings.</Text>
+          <Text style={styles.hint}>You can add more items and rename this anytime in Settings.</Text>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
